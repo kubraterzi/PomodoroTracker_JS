@@ -5,42 +5,37 @@ const totalTaskTime = 25 * 60 * 1000;
 const totalBreakTime = 5 * 60 * 1000;
 
 const taskTime = {
-  min: "25",
-  sec: "00",
+  name: "task",
+  min: "0",
+  sec: "05",
   title: "Pomodoro Info",
   bgColor: "#d04643",
-  hoverColor: "#ac3a38"
+  hoverColor: "#ac3a38",
 };
 const breakTime = {
-  min: "05",
-  sec: "00",
+  name: "break",
+  min: "0",
+  sec: "05",
   title: "Take a break",
   bgColor: "#56bd56",
-  hoverColor: "#3a803a"
+  hoverColor: "#3a803a",
 };
 
 const longBreakTime = {
-    min: "15",
-    sec: "00",
-    title: "Take a long break.",
-    bgColor: "#56bd56",
-    hoverColor: "#3a803a"
-  };
-
+  name: "l_break",
+  min: "15",
+  sec: "00",
+  title: "Take a long break",
+  bgColor: "#56bd56",
+  hoverColor: "#3a803a",
+};
 
 let clickCounter = 0;
+let currentDuration = taskTime.name;
+
 const nextButton = document.querySelector("#next-page-button");
 nextButton.addEventListener("click", () => {
-  if (clickCounter % 2 == 1 ) {
-    nextDuration(taskTime);
-  }else if(clickCounter  %2 == 0 && clickCounter != 6){ // 6 -> 4. pomodoro da uzun mola verir.(1 task + 1 mola = 1 pomodoro)
-    nextDuration(breakTime);
-  }else {
-    nextDuration(longBreakTime)
-  }
-
-  clickCounter += 1;
-  console.log(clickCounter);
+  changeDuration()
 });
 
 var interval;
@@ -48,7 +43,6 @@ const startButton = document.querySelector("#start-button");
 
 const timer = () => {
   startButton.disabled = true;
-
   interval = setInterval(() => {
     let currentTimerSecond =
       +timer_minute.innerText * 60 + +timer_second.innerText;
@@ -59,15 +53,19 @@ const timer = () => {
         timer_second.innerText = "0" + result.sec;
       } else {
         timer_second.innerText = result.sec;
-      }
+      }0
+       
+    }
+    
+    if (currentTimerSecond == 0) {
+      changeDuration(); 
     }
   }, 1000);
 };
 
-const countDown = (second, interval) => {
+const countDown = (second) => {
   if (second > 0) {
     second--;
-
     return {
       min: Math.floor(second / 60),
       sec: second % 60,
@@ -77,20 +75,49 @@ const countDown = (second, interval) => {
   }
 };
 
-
 const timerStop = () => {
   clearInterval(interval);
-  document.getElementById("timer-minute").innerText = "01";
-  document.getElementById("timer-second").innerText = "00";
+
+  switch (currentDuration) {
+    case "task":
+      document.getElementById("timer-minute").innerText = taskTime.min;
+      document.getElementById("timer-second").innerText = taskTime.sec;
+      break;
+
+    case "break":
+      document.getElementById("timer-minute").innerText = breakTime.min;
+      document.getElementById("timer-second").innerText = breakTime.sec;
+      break;
+    case "l_break":
+      document.getElementById("timer-minute").innerText = longBreakTime.min;
+      document.getElementById("timer-second").innerText = longBreakTime.sec;
+      break;
+  }
   startButton.disabled = false;
 };
 
+const timerPause = () => {
+  clearInterval(interval);
+  startButton.innerText="RESUME";
+  startButton.disabled=false;
+  
+}
+
 const nextDuration = (durationType) => {
-  document.getElementById("timer-area").style.setProperty("--timerArea", durationType.bgColor);
+  startButton.disabled = false
+  document
+    .getElementById("timer-area")
+    .style.setProperty("--timerArea", durationType.bgColor);
   document.getElementById("pomodoro-info").innerText = durationType.title;
   document.getElementById("timer-minute").innerText = durationType.min;
   document.getElementById("timer-second").innerText = durationType.sec;
-  hoverHandle(durationType)
+
+  console.log("geçtim")
+  clearInterval(interval);
+  console.log(interval)
+  currentDuration = durationType.name;
+
+  hoverHandle(durationType);
 };
 
 const hoverHandle = (durationType) => {
@@ -99,3 +126,24 @@ const hoverHandle = (durationType) => {
     button.style.setProperty("--hoverColor", durationType.hoverColor);
   });
 };
+
+const changeDuration = () => {
+  startButton.innerText="START"
+  if (currentDuration == taskTime.name) {
+    nextDuration(breakTime);
+  } else {
+    nextDuration(taskTime);
+  }
+
+};
+
+const buttonHandle = (buttonContent) => {
+  switch(buttonContent){
+    case "PAUSE":
+      timerPause();
+      break;
+    case "RESUME":
+      timer();
+      break;
+  }
+}
