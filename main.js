@@ -77,6 +77,7 @@ const countDown = (second) => {
 
 const timerStop = () => {
   clearInterval(interval);
+  startButton.innerText="START"
 
   switch (currentDuration) {
     case "task":
@@ -112,9 +113,7 @@ const nextDuration = (durationType) => {
   document.getElementById("timer-minute").innerText = durationType.min;
   document.getElementById("timer-second").innerText = durationType.sec;
 
-  console.log("geçtim")
   clearInterval(interval);
-  console.log(interval)
   currentDuration = durationType.name;
 
   hoverHandle(durationType);
@@ -137,13 +136,3 @@ const changeDuration = () => {
 
 };
 
-const buttonHandle = (buttonContent) => {
-  switch(buttonContent){
-    case "PAUSE":
-      timerPause();
-      break;
-    case "RESUME":
-      timer();
-      break;
-  }
-}
