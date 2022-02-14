@@ -25,7 +25,11 @@
           <div class="timer_head width_full">
             <div id="pomodoro-info" class="pomodoro_info">Pomodoro INFO</div>
             <div class="to_break">
-              <i id="next-page-button" onclick="nextDuration()" class="fas fa-angle-double-right"></i>
+              <i
+                id="next-page-button"
+                onclick="nextDuration()"
+                class="fas fa-angle-double-right"
+              ></i>
             </div>
           </div>
           <div class="timer_time width_full">
@@ -33,28 +37,19 @@
             <div>:</div>
             <div id="timer-second">05</div>
           </div>
-          <div class="timer_description width_full"></div>
+          <div id="timer-description" class="timer_description width_full"></div>
           <div class="timer_buttons width_full mt_10px">
             <div id="button-container" class="button_container">
               <button
                 id="start-button"
-                onclick="timer()"
+                onclick="timerStartHandle()"
                 class="btn text_center mt_10px"
               >
                 START
               </button>
-
-              <button
-              id="pause-button"
-              onclick="timerPause()"
-              class="btn text_center mt_10px"
-            >
-              PAUSE
-            </button>
-
               <button
                 id="stop-button"
-                onclick="timerStop()"
+                onclick="timerStopHandle()"
                 class="btn text_center mt_10px"
               >
                 STOP
@@ -63,8 +58,47 @@
           </div>
         </div>
       </div>
+      <div class="tasks">
+        <div class="pomodoro_todo">
+          <div class="t_header">
+            <div class="title_line">
+              <span> TODOs </span>
+            </div>
+          </div>
+          <div class="add_todo">
+            <div class="todo_category">
+              <input
+                class="radius_5"
+                list="taskCategories"
+                name="taskCategory"
+                id="taskCategory"
+                placeholder="Category"
+              />
+              <datalist id="taskCategories">
+                <option value="Work"></option>
+                <option value="Personal"></option>
+              </datalist>
+            </div>
+            <div class="todo_description">
+              <input
+                class="radius_5"
+                name="taskDescription"
+                id="taskDescription"
+                placeholder="TODO Description"
+              />
+              <div class="add_todo_item">
+                <i
+                  id="next-page-button"
+                  onclick="addTodo()"
+                  class="fa-solid fa-plus"
+                ></i>
+              </div>
+            </div>
+          </div>
+          <div id="todo-list" class="todo_list"></div>
+        </div>
+      </div>
     </div>
-
     <script src="main.js"></script>
   </body>
 </html>

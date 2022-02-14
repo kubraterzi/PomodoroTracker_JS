@@ -1,13 +1,12 @@
 let timer_minute = document.getElementById("timer-minute");
 let timer_second = document.getElementById("timer-second");
-
-const totalTaskTime = 25 * 60 * 1000;
-const totalBreakTime = 5 * 60 * 1000;
+let tasks = [];
+let todoCount = 0;
 
 const taskTime = {
   name: "task",
-  min: "0",
-  sec: "05",
+  min: "05",
+  sec: "00",
   title: "Pomodoro Info",
   bgColor: "#d04643",
   hoverColor: "#ac3a38",
@@ -35,17 +34,24 @@ let currentDuration = taskTime.name;
 
 const nextButton = document.querySelector("#next-page-button");
 nextButton.addEventListener("click", () => {
-  changeDuration()
+  changeDuration();
 });
 
 var interval;
 const startButton = document.querySelector("#start-button");
+const stopButton = document.querySelector("#stop-button");
+let currentStartButtonText = "START";
+let currentStopButtonText = "STOP";
 
 const timer = () => {
-  startButton.disabled = true;
+  currentStartButtonText = "PAUSE";
+  printButtonText(startButton, currentStartButtonText);
+  printButtonText(stopButton, "STOP");
+
   interval = setInterval(() => {
     let currentTimerSecond =
       +timer_minute.innerText * 60 + +timer_second.innerText;
+
     const result = countDown(currentTimerSecond);
     if (result) {
       timer_minute.innerText = result.min;
@@ -53,12 +59,10 @@ const timer = () => {
         timer_second.innerText = "0" + result.sec;
       } else {
         timer_second.innerText = result.sec;
-      }0
-       
+      }
     }
-    
     if (currentTimerSecond == 0) {
-      changeDuration(); 
+      changeDuration();
     }
   }, 1000);
 };
@@ -77,14 +81,14 @@ const countDown = (second) => {
 
 const timerStop = () => {
   clearInterval(interval);
-  startButton.innerText="START"
+  currentStartButtonText = "START";
+  printButtonText(startButton, currentStartButtonText);
 
   switch (currentDuration) {
     case "task":
       document.getElementById("timer-minute").innerText = taskTime.min;
       document.getElementById("timer-second").innerText = taskTime.sec;
       break;
-
     case "break":
       document.getElementById("timer-minute").innerText = breakTime.min;
       document.getElementById("timer-second").innerText = breakTime.sec;
@@ -99,23 +103,22 @@ const timerStop = () => {
 
 const timerPause = () => {
   clearInterval(interval);
-  startButton.innerText="RESUME";
-  startButton.disabled=false;
-  
-}
+  currentStartButtonText = "RESUME";
+  printButtonText(startButton, currentStartButtonText);
+  currentStopButtonText = "DONE";
+  printButtonText(stopButton, currentStopButtonText);
+};
 
 const nextDuration = (durationType) => {
-  startButton.disabled = false
+  startButton.disabled = false;
   document
     .getElementById("timer-area")
     .style.setProperty("--timerArea", durationType.bgColor);
   document.getElementById("pomodoro-info").innerText = durationType.title;
   document.getElementById("timer-minute").innerText = durationType.min;
   document.getElementById("timer-second").innerText = durationType.sec;
-
   clearInterval(interval);
   currentDuration = durationType.name;
-
   hoverHandle(durationType);
 };
 
@@ -127,12 +130,85 @@ const hoverHandle = (durationType) => {
 };
 
 const changeDuration = () => {
-  startButton.innerText="START"
+  printButtonText(startButton, "START");
+  currentStartButtonText = "START";
   if (currentDuration == taskTime.name) {
+    doneTask();
     nextDuration(breakTime);
   } else {
     nextDuration(taskTime);
   }
+};
+
+const timerStartHandle = () => {
+  const actions = {
+    START: timer,
+    RESUME: timer,
+    PAUSE: timerPause,
+  };
+  actions[currentStartButtonText]();
+};
+
+const timerStopHandle = () => {
+  const actions = {
+    DONE: doneTask,
+    STOP: timerStop,
+  };
+  actions[currentStopButtonText]();
+};
+
+const printButtonText = (selectedButton, buttonText) => {
+  selectedButton.innerText = buttonText;
+};
+
+const doneTask = () => {
+  console.log("done!");
+  printButtonText(stopButton, "STOP");
+  timerStop();
+  removeTodoItem();
 
 };
 
+const addTodo = () => {
+  const categoryName = document.querySelector("#taskCategory").value;
+  const taskDescription = document.querySelector("#taskDescription").value;
+  tasks.push({
+    taskCategory: categoryName,
+    taskDescription: taskDescription,
+  });
+  createNewELement(categoryName, taskDescription);
+};
+
+const createNewELement = (taskCategory, taskDescription) => {
+  todoCount++;
+  const allTodos = document.querySelector("#todo-list");
+  let todoListItem = document.createElement("div");
+  todoListItem.classList.add("todo_list_item");
+  todoListItem.setAttribute("data-index", todoCount);
+
+  let todosCategory = document.createElement("div");
+  todosCategory.classList.add("todos_category");
+  todosCategory.innerText = taskCategory;
+
+  let todosDescription = document.createElement("div");
+  todosDescription.classList.add("todos_description");
+  todosDescription.innerText = taskDescription;
+
+  let removeItem = document.createElement("div");
+  removeItem.classList.add("remove_todo_item");
+  removeItem.append('<i class="fa-solid fa-xmark"></i>');
+  removeItem.addEventListener("click", removeTodoItem);
+
+
+  todoListItem.appendChild(todosCategory);
+  todoListItem.appendChild(todosDescription);
+  todoListItem.appendChild(removeItem);
+  allTodos.appendChild(todoListItem);
+};
+
+
+const removeTodoItem = () => {
+  let removeElement = document.querySelectorAll(".todo_list_item");
+  removeElement[0].remove();
+  todoCount--;
+}
